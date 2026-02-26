@@ -1,0 +1,14 @@
+{
+    "// INSTRUCTIONS": "Copy this file to 'godot-mcp.config.json' and fill in your paths",
+    "godotPath": "C:\\path\\to\\Godot_v4.x.exe",
+    "godotProjectPath": "D:\\path\\to\\your\\godot\\project",
+    "// NOTES": [
+        "godotPath: Optional. Path to Godot executable. Auto-detected if not set.",
+        "godotProjectPath: Optional. Points tools to your game project. Without this, the server may find the wrong project.godot.",
+        "You can also set GODOT_PATH and GODOT_PROJECT_PATH as environment variables in your MCP client config instead."
+    ],
+    "debugMode": false,
+    "readOnlyMode": false,
+    "websocketUrl": "ws://127.0.0.1:9080",
+    "commandTimeout": 30000
+}

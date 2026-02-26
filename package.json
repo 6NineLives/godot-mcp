@@ -1,0 +1,37 @@
+{
+  "name": "godot-mcp",
+  "version": "0.2.0",
+  "description": "MCP server for Godot Engine — zero-config auto-detection, semantic search, visual diff UI, and full editor integration.",
+  "type": "module",
+  "bin": {
+    "godot-mcp": "./server/dist/index.js"
+  },
+  "files": [
+    "server/dist",
+    "server/scripts"
+  ],
+  "scripts": {
+    "build": "cd server && npm run build",
+    "prepare": "npm run build",
+    "start": "node server/dist/index.js",
+    "inspector": "npx @modelcontextprotocol/inspector server/dist/index.js"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "@types/node": "^20.11.24"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Coding-Solo/godot-mcp.git"
+  },
+  "keywords": [
+    "godot",
+    "mcp",
+    "ai",
+    "claude",
+    "cline",
+    "fastmcp",
+    "game-engine"
+  ]
+}

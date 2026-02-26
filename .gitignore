@@ -1,0 +1,69 @@
+# Godot-specific ignores
+.godot/
+.import/
+export.cfg
+export_presets.cfg
+*.translation
+
+# Node.js and npm
+node_modules/
+server/node_modules/
+dist/
+server/dist/
+npm-debug.log
+.tmp/
+.log/
+*.log
+
+# Project specific
+godot-mcp.config.json
+claude_desktop_config.json
+.env
+docs_cache/
+
+# System files
+.DS_Store
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Visual Studio / VSCode
+.vscode/
+.idea/
+
+# Build artifacts
+*.o
+*.os
+*.obj
+*.bc
+*.pyc
+*.pyo
+__pycache__/
+
+# Various temporary files
+*.swp
+*~
+.~lock.*
+
+# Reference material
+reference_code/
+
+# Build output
+build/
+out/
+
+# Test and development output
+*test_out*.txt
+*test_result*.txt
+*error_out*.txt
+coverage/
+.nyc_output/
+*test_index*.js
+TestScene.tscn
+test/
+tests/
+__tests__/
+
+# Documentation and Cache
+docs/
+docs_cache/
