@@ -19,7 +19,7 @@ npm run build
 ```
 
 ### 3. Configure the MCP Client (Claude Desktop Example)
-Add the following configuration to your `claude_desktop_config.json`:
+Add the following configuration to your `mcp config json`:
 ```json
 {
   "mcpServers": {
