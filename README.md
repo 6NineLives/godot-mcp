@@ -13,7 +13,7 @@ Godot MCP provides a comprehensive, production-ready integration between Large L
 ### 2. Add the Godot Plugin
 Navigate to your specific Godot project's root folder in your terminal and run:
 ```bash
-npx -y godot-mcp install
+npx -y @xianlee/godot-mcp install
 ```
 This will automatically copy the `addons/godot_mcp` folder into your project. Enable the `godot_mcp` plugin via **Project > Project Settings > Plugins** in the Godot Editor.
 
@@ -24,7 +24,7 @@ Add the following configuration to your `mcp config json`:
   "mcpServers": {
     "godot-mcp": {
       "command": "npx",
-      "args": ["-y", "godot-mcp"],
+      "args": ["-y", "@xianlee/godot-mcp"],
       "env": {
         "GODOT_PATH": "<OPTIONAL_ABSOLUTE_PATH_TO_GODOT_EXECUTABLE>"
       }
