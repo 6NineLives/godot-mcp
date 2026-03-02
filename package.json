@@ -1,5 +1,5 @@
 {
-  "name": "godot-mcp",
+  "name": "@xianlee/godot-mcp",
   "version": "0.2.0",
   "description": "MCP server for Godot Engine — zero-config auto-detection, semantic search, visual diff UI, and full editor integration.",
   "type": "module",
