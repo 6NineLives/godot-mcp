@@ -67,3 +67,6 @@ __tests__/
 # Documentation and Cache
 docs/
 docs_cache/
+
+# NPM Authentication
+.npmrc
