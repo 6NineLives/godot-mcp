@@ -10,13 +10,12 @@ Godot MCP provides a comprehensive, production-ready integration between Large L
 - Godot Engine 4.x
 - Supported MCP client (e.g., Claude Desktop)
 
-### 2. Setup the Server
+### 2. Add the Godot Plugin
+Navigate to your specific Godot project's root folder in your terminal and run:
 ```bash
-git clone https://github.com/6NineLives/godot-mcp
-cd godot-mcp/server
-npm install
-npm run build
+npx -y godot-mcp install
 ```
+This will automatically copy the `addons/godot_mcp` folder into your project. Enable the `godot_mcp` plugin via **Project > Project Settings > Plugins** in the Godot Editor.
 
 ### 3. Configure the MCP Client (Claude Desktop Example)
 Add the following configuration to your `mcp config json`:
@@ -24,8 +23,8 @@ Add the following configuration to your `mcp config json`:
 {
   "mcpServers": {
     "godot-mcp": {
-      "command": "node",
-      "args": ["<ABSOLUTE_PATH_TO_GODOT_MCP>/server/dist/index.js"],
+      "command": "npx",
+      "args": ["-y", "godot-mcp"],
       "env": {
         "GODOT_PATH": "<OPTIONAL_ABSOLUTE_PATH_TO_GODOT_EXECUTABLE>"
       }
@@ -34,11 +33,9 @@ Add the following configuration to your `mcp config json`:
 }
 ```
 
-### 4. Godot Addon Installation
-1. Open your Godot project.
-2. Copy the `addons/godot_mcp` folder from this repository into your project's `addons/` directory.
-3. Ensure the `godot_mcp` plugin is enabled in Godot via **Project > Project Settings > Plugins**.
-4. Start your MCP Client. The server will seamlessly connect to the Godot WebSocket.
+### 4. Running the Complete Toolchain
+1. Ensure your Godot editor is open with the `godot_mcp` plugin enabled.
+2. Start your MCP Client (like Claude Desktop). The server will download on-the-fly and seamlessly jump into the Godot WebSocket.
 
 ## Feature List
 

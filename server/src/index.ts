@@ -1,4 +1,8 @@
+#!/usr/bin/env node
 import { FastMCP } from 'fastmcp';
+import * as fs from 'fs';
+import * as path from 'path';
+import { fileURLToPath } from 'url';
 
 // Consolidated tool modules
 import { nodeTools } from './tools/scene/node_tools.js';
@@ -64,6 +68,44 @@ import {
  * Main entry point for the consolidated Godot MCP server.
  */
 async function main() {
+  // ---------------------------------------------------------------------------
+  // Check for CLI args (e.g. `npx godot-mcp install`)
+  // ---------------------------------------------------------------------------
+  const args = process.argv.slice(2);
+  if (args.includes('install')) {
+    logInfo('Running Godot MCP installation utility...');
+    const targetDir = path.join(process.cwd(), 'addons');
+
+    // We are running from dist/index.js, so we need to step up to the repository root
+    const __filename = fileURLToPath(import.meta.url);
+    const __dirname = path.dirname(__filename);
+    const rootDir = path.resolve(__dirname, '..', '..');
+    const sourceAddonDir = path.join(rootDir, 'addons', 'godot_mcp');
+
+    if (!fs.existsSync(sourceAddonDir)) {
+      logError(`Could not locate source addon at ${sourceAddonDir}`);
+      process.exit(1);
+    }
+
+    const targetAddonDir = path.join(targetDir, 'godot_mcp');
+    logInfo(`Installing Godot MCP addon to: ${targetAddonDir}`);
+
+    if (fs.existsSync(targetAddonDir)) {
+      logWarn('Addon directory already exists! Overwriting...');
+      fs.rmSync(targetAddonDir, { recursive: true, force: true });
+    }
+
+    fs.mkdirSync(targetDir, { recursive: true });
+    fs.cpSync(sourceAddonDir, targetAddonDir, { recursive: true });
+
+    logInfo('✓ Installation successful!');
+    logInfo('Next steps:');
+    logInfo('  1. Open your Godot project.');
+    logInfo('  2. Go to Project -> Project Settings -> Plugins.');
+    logInfo('  3. Enable the "Godot MCP" plugin.');
+    process.exit(0);
+  }
+
   logInfo('Starting Godot MCP server...');
 
   const config = loadConfig();
