@@ -64,47 +64,111 @@ import {
   currentScriptResource,
 } from './resources/editor_resources.js';
 
-/**
- * Main entry point for the consolidated Godot MCP server.
- */
-async function main() {
-  // ---------------------------------------------------------------------------
-  // Check for CLI args (e.g. `npx godot-mcp install`)
-  // ---------------------------------------------------------------------------
-  const args = process.argv.slice(2);
-  if (args.includes('install')) {
-    logInfo('Running Godot MCP installation utility...');
-    const targetDir = path.join(process.cwd(), 'addons');
+// ---------------------------------------------------------------------------
+// Install command — must run before the async server starts so that
+// process.exit() is clean and no async I/O is left dangling.
+// ---------------------------------------------------------------------------
+function runInstall(): void {
+  // Use console.log (stdout) for all install output so it is always visible
+  // in Windows terminals (CMD / PowerShell).  The rest of the server uses
+  // console.error / stderr because MCP communicates over stdout, but this
+  // CLI path is user-facing.
+  console.log('[INFO] Running Godot MCP installation utility...');
 
-    // We are running from dist/index.js, so we need to step up to the repository root
-    const __filename = fileURLToPath(import.meta.url);
-    const __dirname = path.dirname(__filename);
-    const rootDir = path.resolve(__dirname, '..', '..');
-    const sourceAddonDir = path.join(rootDir, 'addons', 'godot_mcp');
+  // Resolve the source addon directory relative to THIS script file.
+  // When installed via npx, __dirname is:
+  //   <npx_cache>/node_modules/@xianlee/godot-mcp/server/dist
+  // Two levels up (.., ..) gives the package root which contains addons/.
+  const __filename = fileURLToPath(import.meta.url);
+  const __dirname = path.dirname(__filename);
 
-    if (!fs.existsSync(sourceAddonDir)) {
-      logError(`Could not locate source addon at ${sourceAddonDir}`);
-      process.exit(1);
+  // Try the standard path first, then walk further up as a fallback in case
+  // the package is extracted at a different depth (e.g. workspace hoisting).
+  let sourceAddonDir = '';
+  const candidates = [
+    path.resolve(__dirname, '..', '..', 'addons', 'godot_mcp'),
+    path.resolve(__dirname, '..', '..', '..', 'addons', 'godot_mcp'),
+  ];
+  for (const candidate of candidates) {
+    if (fs.existsSync(candidate)) {
+      sourceAddonDir = candidate;
+      break;
     }
+  }
 
-    const targetAddonDir = path.join(targetDir, 'godot_mcp');
-    logInfo(`Installing Godot MCP addon to: ${targetAddonDir}`);
+  if (!sourceAddonDir) {
+    console.log('[ERROR] Could not locate the addon source directory.');
+    console.log('[ERROR] Searched in:');
+    for (const c of candidates) {
+      console.log(`[ERROR]   ${c}`);
+    }
+    console.log('[ERROR] The npm package may be corrupted. Try reinstalling:');
+    console.log('[ERROR]   npm install -g @xianlee/godot-mcp');
+    process.exit(1);
+  }
 
+  const targetDir = path.join(process.cwd(), 'addons');
+  const targetAddonDir = path.join(targetDir, 'godot_mcp');
+  console.log(`[INFO] Source : ${sourceAddonDir}`);
+  console.log(`[INFO] Target : ${targetAddonDir}`);
+
+  try {
     if (fs.existsSync(targetAddonDir)) {
-      logWarn('Addon directory already exists! Overwriting...');
+      console.log('[WARN] Addon directory already exists — overwriting...');
       fs.rmSync(targetAddonDir, { recursive: true, force: true });
     }
 
     fs.mkdirSync(targetDir, { recursive: true });
-    fs.cpSync(sourceAddonDir, targetAddonDir, { recursive: true });
-
-    logInfo('✓ Installation successful!');
-    logInfo('Next steps:');
-    logInfo('  1. Open your Godot project.');
-    logInfo('  2. Go to Project -> Project Settings -> Plugins.');
-    logInfo('  3. Enable the "Godot MCP" plugin.');
-    process.exit(0);
+    copyDirSync(sourceAddonDir, targetAddonDir);
+  } catch (err) {
+    console.log(`[ERROR] Installation failed: ${err}`);
+    if (process.platform === 'win32') {
+      console.log('[ERROR] On Windows you may need to:');
+      console.log('[ERROR]   • Run your terminal as Administrator, OR');
+      console.log('[ERROR]   • Enable Long Path support (gpedit or registry), OR');
+      console.log('[ERROR]   • Manually copy the addon from the npm cache.');
+    }
+    process.exit(1);
   }
+
+  console.log('[INFO] ✓ Installation successful!');
+  console.log('[INFO] Next steps:');
+  console.log('[INFO]   1. Open your Godot project.');
+  console.log('[INFO]   2. Go to Project -> Project Settings -> Plugins.');
+  console.log('[INFO]   3. Enable the "Godot MCP" plugin.');
+  process.exit(0);
+}
+
+/**
+ * Cross-platform recursive directory copy.
+ *
+ * `fs.cpSync` (Node ≥ 16.7) is used when available; otherwise we fall back
+ * to a manual implementation.  The manual path also avoids the `EPERM`
+ * errors that `fs.cpSync` can produce on Windows when copying from a
+ * read-only location such as the npm cache.
+ */
+function copyDirSync(src: string, dest: string): void {
+  fs.mkdirSync(dest, { recursive: true });
+  for (const entry of fs.readdirSync(src, { withFileTypes: true })) {
+    const srcPath = path.join(src, entry.name);
+    const destPath = path.join(dest, entry.name);
+    if (entry.isDirectory()) {
+      copyDirSync(srcPath, destPath);
+    } else {
+      fs.copyFileSync(srcPath, destPath);
+    }
+  }
+}
+
+// Run install before the async server starts so that process.exit() is clean.
+if (process.argv.slice(2).includes('install')) {
+  runInstall();
+}
+
+/**
+ * Main entry point for the consolidated Godot MCP server.
+ */
+async function main() {
 
   logInfo('Starting Godot MCP server...');
 
